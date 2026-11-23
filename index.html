@@ -1,0 +1,389 @@
+<!doctype html>
+<html lang="ko">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" media="(prefers-color-scheme: light)" content="#f4f5f8">
+<meta name="theme-color" media="(prefers-color-scheme: dark)" content="#111216">
+<title>YC · AI · 테크 뉴스</title>
+<style>
+  :root {
+    color-scheme: light dark;
+    --background: #f4f5f8;
+    --surface: #fff;
+    --text: #191b24;
+    --muted: #626676;
+    --line: #e9eaf0;
+    --accent: #2949b8;
+    --accent-fill: #edf0ff;
+    --shadow: 0 1px 2px #171e3805, 0 8px 28px #171e3807;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --background: #111216;
+      --surface: #1c1e25;
+      --text: #f3f3f8;
+      --muted: #acaebd;
+      --line: #323440;
+      --accent: #b1bbff;
+      --accent-fill: #2b3255;
+      --shadow: 0 2px 18px #0002;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--background);
+    color: var(--text);
+    font: 1rem/1.48 -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  }
+  main {
+    max-width: 68rem;
+    margin: auto;
+    padding: clamp(1.75rem, 3.5vw, 3rem) max(1.25rem, env(safe-area-inset-right))
+      max(2rem, env(safe-area-inset-bottom)) max(1.25rem, env(safe-area-inset-left));
+  }
+  header { display: flex; align-items: end; justify-content: space-between; gap: 1.2rem; margin-bottom: 1.5rem; }
+  h1, h2, p { margin: 0; }
+  h1 { font-size: clamp(2.25rem, 5vw, 3.25rem); font-weight: 780; line-height: 1.08; letter-spacing: -.06em; }
+  h2 { font-size: 1.25rem; font-weight: 730; line-height: 1.25; letter-spacing: -.035em; }
+  a { color: inherit; text-decoration: none; overflow-wrap: anywhere; }
+  a:hover { color: var(--accent); text-decoration: underline; text-underline-offset: 3px; }
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: .25rem; }
+  button {
+    min-height: 2.75rem;
+    padding: .55rem 1rem;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    background: var(--surface);
+    color: var(--text);
+    cursor: pointer;
+    font: 650 .875rem/1.2 -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+    white-space: nowrap;
+  }
+  button:hover:not(:disabled) { color: var(--accent); }
+  button:active:not(:disabled) { opacity: .75; }
+  button:disabled { cursor: wait; opacity: .65; }
+  #translate { background: var(--accent-fill); color: var(--accent); border-color: transparent; }
+  .controls { display: flex; gap: .5rem; flex-wrap: wrap; flex-shrink: 0; }
+  .status { color: var(--muted); font-size: .875rem; min-height: 1.3em; margin-top: .65rem; font-variant-numeric: tabular-nums; }
+  .grid { display: grid; gap: 1rem; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .grid:has(details[open]) { align-items: start; }
+  article {
+    display: flex; flex-direction: column;
+    background: var(--surface); border: 1px solid var(--line); border-radius: 1.4rem;
+    box-shadow: var(--shadow); padding: .15rem clamp(1rem, 2.5vw, 1.5rem) 0;
+  }
+  .panel-heading { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: .5rem; padding: .85rem 0 .75rem; }
+  .panel-title { display: flex; align-items: center; gap: .65rem; }
+  .section-mark { width: .5rem; height: .5rem; border-radius: 50%; background: var(--accent); flex: none; }
+  article:nth-child(1) .section-mark { background: #e78054; }
+  article:nth-child(2) .section-mark { background: #9173ed; }
+  article:nth-child(3) .section-mark { background: #4985e9; }
+  article:nth-child(4) .section-mark { background: #38a98e; }
+  .panel-link { color: var(--accent); font-size: .875rem; font-weight: 630; padding: .1rem 0 .1rem .3rem; }
+  ul { list-style: none; margin: 0; padding: 0; }
+  li { border-top: 1px solid var(--line); padding: .7rem 0 .75rem; }
+  .headline, .teaser { word-break: keep-all; overflow-wrap: anywhere; }
+  .headline { font-size: 1.0625rem; font-weight: 675; line-height: 1.38; letter-spacing: -.02em; display: inline-block; }
+  .teaser { font-size: .9375rem; margin-top: .3rem; color: var(--muted); }
+  .meta, .notice { color: var(--muted); font-size: .8125rem; }
+  .meta { margin-bottom: .28rem; font-variant-numeric: tabular-nums; }
+  .source-name { font-weight: 650; }
+  .notice { padding: .7rem 0; }
+  .notice a { text-decoration: underline; text-underline-offset: 2px; }
+  details { margin-top: auto; }
+  summary {
+    display: flex; min-height: 2.75rem; align-items: center; justify-content: space-between; gap: 1rem;
+    border-top: 1px solid var(--line); list-style: none; cursor: pointer; color: var(--accent);
+    font-size: .875rem; font-weight: 650;
+  }
+  summary::-webkit-details-marker { display: none; }
+  summary::after {
+    content: ''; width: .4rem; height: .4rem; margin: 0 .21rem .19rem 0;
+    border: solid currentColor; border-width: 0 1.5px 1.5px 0; transform: rotate(45deg);
+  }
+  details[open] > summary::after { transform: rotate(225deg); margin-bottom: -.19rem; }
+  @media (max-width: 43rem) {
+    .grid { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 32rem) {
+    header { align-items: start; flex-direction: column; }
+    main { padding-top: max(1.5rem, env(safe-area-inset-top)); }
+  }
+</style>
+<main>
+  <header>
+    <div>
+      <h1>오늘의 브리핑</h1>
+      <p id="status" class="status" role="status">피드를 불러오는 중…</p>
+    </div>
+    <div class="controls">
+      <button id="translate" type="button" hidden aria-pressed="false">한국어로 보기</button>
+      <button id="refresh" type="button">새로고침</button>
+    </div>
+  </header>
+  <section class="grid" id="feeds" aria-label="카테고리별 뉴스"></section>
+  <noscript>기사 목록을 표시하려면 브라우저에서 JavaScript를 켜 주세요.</noscript>
+</main>
+<script>
+  const sections = [
+    {
+      title: 'YC · 스타트업',
+      extra: ['Launch YC', 'https://www.ycombinator.com/launches'],
+      sources: [
+        ['YC 블로그', 'https://www.ycombinator.com/blog/feed', 'https://www.ycombinator.com/blog'],
+        ['Launch HN', 'https://hnrss.org/launches', 'https://news.ycombinator.com/launches'],
+      ],
+    },
+    {
+      title: 'AI 발표',
+      sources: [
+        ['OpenAI', 'https://openai.com/news/rss.xml', 'https://openai.com/news/'],
+        ['Google AI', 'https://blog.google/innovation-and-ai/rss/', 'https://blog.google/innovation-and-ai/'],
+      ],
+    },
+    {
+      title: '테크 업계',
+      sources: [
+        ['Techmeme', 'https://www.techmeme.com/feed.xml', 'https://www.techmeme.com/'],
+        ['Hacker News', 'https://news.ycombinator.com/rss', 'https://news.ycombinator.com/'],
+      ],
+    },
+    {
+      title: '새로운 도구',
+      sources: [
+        ['Show HN', 'https://hnrss.org/show', 'https://news.ycombinator.com/shownew'],
+        ['Product Hunt', 'https://www.producthunt.com/feed', 'https://www.producthunt.com/'],
+      ],
+    },
+  ];
+
+  const grid = document.querySelector('#feeds');
+  const sourceHomes = new Map(sections.flatMap(section => section.sources.map(([name, , home]) => [name, home])));
+  const status = document.querySelector('#status');
+  const refresh = document.querySelector('#refresh');
+  const translateButton = document.querySelector('#translate');
+  const languages = { sourceLanguage: 'en', targetLanguage: 'ko' };
+  const translations = new Map();
+  const sentenceSegmenter = new Intl.Segmenter('en', { granularity: 'sentence' });
+  let translator;
+  let showKorean = false;
+  let failedFeeds = [];
+  const cacheKey = 'yc-ai-tech-news:1';
+  const timeFormat = new Intl.DateTimeFormat('ko', { month: 'numeric', day: 'numeric', hour: 'numeric', minute: 'numeric' });
+  let cache = {};
+  try { cache = JSON.parse(localStorage.getItem(cacheKey)) || {}; } catch { /* Storage may be unavailable for local files. */ }
+
+  function element(tag, label, className) {
+    const node = document.createElement(tag);
+    if (label) node.textContent = label;
+    if (className) node.className = className;
+    return node;
+  }
+
+  function link(title, url, className) {
+    const anchor = element('a', title, className);
+    anchor.href = url;
+    anchor.target = '_blank';
+    anchor.rel = 'noopener noreferrer';
+    return anchor;
+  }
+
+  function readXml(xml) {
+    const document = new DOMParser().parseFromString(xml, 'application/xml');
+    return [...document.querySelectorAll('item, entry')].map(entry => {
+      const text = selector => entry.querySelector(selector)?.textContent;
+      const atomLink = entry.querySelector('link[rel="alternate"], link[href]:not([rel])');
+      return {
+        title: text('title'),
+        link: atomLink?.getAttribute('href') || text('link'),
+        pubDate: text('pubDate, published, updated'),
+        description: text('description, summary'),
+        content: text('content'),
+      };
+    });
+  }
+
+  function makeTeaser(html, title) {
+    if (typeof html !== 'string' || !html.trim()) return '';
+    const template = document.createElement('template');
+    template.innerHTML = html;
+    for (const node of template.content.querySelectorAll('script, style, iframe, svg, noscript, img, figure, figcaption')) node.remove();
+    for (const node of template.content.querySelectorAll('p, div, br, li, blockquote')) node.after('\n');
+    const parts = template.content.textContent
+      .split(/\n+/)
+      .map(line => line.replace(/\s+/g, ' ').trim().replace(/^(?:[^:]{1,45} \/ [^:]{1,45}:\s*)|[|·]\s*$/g, '').trim())
+      .filter(line => line && !/^(?:article url|comments? url|points|# comments):/i.test(line));
+    const wordsOnly = text => text.toLowerCase().replace(/[^\p{L}\p{N}]+/gu, ' ').trim();
+    const headlineWords = wordsOnly(title);
+    const first = parts
+      .flatMap(line => [...sentenceSegmenter.segment(line)].map(({ segment }) => segment.trim()))
+      .find(sentence => sentence.split(/\s+/).length >= 5
+        && !/^(?:hey|hi|hello)\b/i.test(sentence)
+        && !headlineWords.includes(wordsOnly(sentence)));
+    if (!first || first.length <= 155) return first || '';
+    const cut = first.slice(0, 154);
+    return `${cut.replace(/\s+\S*$/, '').trimEnd()}…`;
+  }
+
+  function normalize(items, source) {
+    return items.flatMap(item => {
+      const title = typeof item.title === 'string' ? item.title.trim() : '';
+      const url = typeof item.link === 'string' ? URL.parse(item.link) : null;
+      if (!title || !['https:', 'http:'].includes(url?.protocol)) return [];
+      const date = typeof item.pubDate === 'string' ? item.pubDate.trim() : '';
+      const timestamp = Date.parse(date.replace(/^(\d{4}-\d\d-\d\d) (\d\d:\d\d:\d\d)$/, '$1T$2Z')) || 0;
+      const teaser = makeTeaser(item.description, title) || makeTeaser(item.content, title);
+      return [{ title, url: url.href, timestamp, source, teaser }];
+    }).sort((first, second) => second.timestamp - first.timestamp);
+  }
+
+  async function getResponse(url) {
+    const response = await fetch(url, { credentials: 'omit', signal: AbortSignal.timeout(8000) });
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    return response;
+  }
+
+  async function fetchFeed([name, feedUrl]) {
+    try {
+      const items = normalize(readXml(await (await getResponse(feedUrl)).text()), name);
+      if (items.length) return items;
+    } catch { /* Most publisher feeds require a cross-origin converter. */ }
+
+    const converter = new URL('https://api.rss2json.com/v1/api.json');
+    converter.searchParams.set('rss_url', feedUrl);
+    const data = await (await getResponse(converter)).json();
+    const items = normalize(Array.isArray(data.items) ? data.items : [], name);
+    if (!items.length) throw new Error(data.message || 'Feed contains no headlines');
+    return items;
+  }
+
+  function translateText(node, text) {
+    if (!showKorean) return;
+    if (!translations.has(text)) {
+      translations.set(text, translator.translate(text).catch(() => {
+        translations.delete(text);
+        return text;
+      }));
+    }
+    translations.get(text).then(result => {
+      if (node.isConnected) node.textContent = result;
+    });
+  }
+
+  function renderList(items) {
+    const list = element('ul');
+    for (const item of items.sort((first, second) => second.timestamp - first.timestamp)) {
+      const row = element('li');
+      const meta = element('p', '', 'meta');
+      const home = sourceHomes.get(item.source);
+      meta.append(home ? link(item.source, home, 'source-name') : item.source);
+      if (item.timestamp) {
+        const time = element('time', timeFormat.format(item.timestamp));
+        time.dateTime = new Date(item.timestamp).toISOString();
+        meta.append(' · ', time);
+      }
+      const title = link(item.title, item.url, 'headline');
+      title.title = item.title;
+      row.append(meta, title);
+      translateText(title, item.title);
+      if (item.teaser) {
+        const teaser = element('p', item.teaser, 'teaser');
+        row.append(teaser);
+        translateText(teaser, item.teaser);
+      }
+      list.append(row);
+    }
+    return list;
+  }
+
+  function render() {
+    const open = new Set([...grid.querySelectorAll('details[open]')].map(detail => detail.dataset.section));
+    grid.replaceChildren();
+    for (const section of sections) {
+      const panel = element('article');
+      const heading = element('div', '', 'panel-heading');
+      const mark = element('span', '', 'section-mark');
+      mark.setAttribute('aria-hidden', 'true');
+      const title = element('div', '', 'panel-title');
+      title.append(mark, element('h2', section.title));
+      heading.append(title);
+      if (section.extra) heading.append(link(...section.extra, 'panel-link'));
+      panel.append(heading);
+
+      const lists = section.sources.map(([, url]) => cache[url]?.items || []);
+      const present = lists.flatMap(items => items.slice(0, 1));
+      const extra = lists.flatMap(items => items.slice(1));
+      if (present.length) panel.append(renderList(present));
+      if (extra.length) {
+        const detail = element('details');
+        detail.dataset.section = section.title;
+        detail.open = open.has(section.title);
+        detail.append(element('summary', '기사 더 보기'));
+        if (detail.open) detail.append(renderList(extra));
+        detail.addEventListener('toggle', () => {
+          if (detail.open && detail.children.length === 1) detail.append(renderList(extra));
+        });
+        panel.append(detail);
+      }
+      const unavailable = section.sources.filter(([, url]) => failedFeeds.includes(url));
+      if (unavailable.length) {
+        const notice = element('p', '업데이트 실패', 'notice');
+        for (const [name, , home] of unavailable) notice.append(' · ', link(name, home));
+        panel.append(notice);
+      }
+      grid.append(panel);
+    }
+  }
+
+  async function loadFeeds() {
+    refresh.disabled = true;
+    status.textContent = '피드를 불러오는 중…';
+    const sources = sections.flatMap(section => section.sources);
+    const failed = [];
+    await Promise.all(sources.map(async source => {
+      const [, url] = source;
+      try {
+        cache[url] = { items: await fetchFeed(source) };
+      } catch {
+        failed.push(url);
+      }
+    }));
+    failedFeeds = failed;
+    render();
+    try { localStorage.setItem(cacheKey, JSON.stringify(cache)); } catch { /* Reading still works without storage. */ }
+    const available = sources.length - failed.length;
+    status.textContent = available
+      ? `${available === sources.length ? `${available}개` : `${available}/${sources.length}개`} 출처 · ${timeFormat.format(Date.now())} 확인`
+      : '피드를 업데이트하지 못했습니다. 새로고침을 눌러 다시 시도해 주세요.';
+    refresh.disabled = false;
+  }
+
+  if ('Translator' in self) {
+    Translator.availability(languages).then(availability => {
+      translateButton.hidden = availability === 'unavailable';
+    }).catch(() => {});
+  }
+
+  translateButton.addEventListener('click', async () => {
+    translateButton.disabled = true;
+    translateButton.textContent = '번역 준비 중…';
+    try {
+      translator ??= await Translator.create(languages);
+      showKorean = !showKorean;
+      translateButton.setAttribute('aria-pressed', String(showKorean));
+      translateButton.textContent = showKorean ? '영어로 보기' : '한국어로 보기';
+      render();
+    } catch {
+      translateButton.textContent = '한국어 번역 다시 시도';
+    } finally {
+      translateButton.disabled = false;
+    }
+  });
+
+  refresh.addEventListener('click', loadFeeds);
+  render();
+  loadFeeds();
+</script>
+</html>
